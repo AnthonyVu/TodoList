@@ -1,0 +1,61 @@
+body {
+    height: 100%;
+    width: 100%;
+    background-color:#fff3af;
+}
+.form div, .form button {
+    margin: 5px;
+}
+
+.form {
+    float: left;
+    width: 15%;
+    margin: 10px;
+    border-radius: 5%;
+    background-color: #f2d9a4;
+}
+
+button {
+    margin: 5px;
+}
+
+.itemList {
+    margin: 10px;
+    width: 80%;
+    overflow: auto;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+    border-spacing: 1em;
+}
+
+th {
+    background-color:#fff3af;
+}
+
+td, th {
+    text-align: left;
+    width: 20%;
+    word-wrap: break-word;
+}
+
+.editButton {
+    width: 10%;
+    display: inline-block;
+}
+.deleteButton {
+    width: 10%;
+    display: inline-block;
+}
+
+.Header {
+    background: #ffc400;
+    padding: 10px;
+}
+
+.Header h1 {
+    margin: 0;
+    color: white;
+}
