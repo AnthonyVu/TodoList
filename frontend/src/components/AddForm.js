@@ -8,7 +8,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 const AddForm = ({token, todos, setTodos, user}) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [dueDate, setDueDate] = useState(new Date());
+    const [dueDate, setDueDate] = useState('');
     const [priority, setPriority] = useState('low');
 
     const onSubmit = async (e) => {
@@ -49,7 +49,6 @@ const AddForm = ({token, todos, setTodos, user}) => {
                 />
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DatePicker
-                        disableUnderline
                         disablePast
                         openTo="year"
                         views={['year', 'month', 'day']}

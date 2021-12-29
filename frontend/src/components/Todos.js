@@ -31,7 +31,7 @@ const Todos = ({todos, setTodos, token, user}) => {
             <Grid container spacing={2}>
                 <Grid item xs={8}>
                     {todos.map(todo => 
-                        <Todo key={todo.id} todo={todo} token={token} todos={todos} setTodos={setTodos}/>
+                        <Todo key={todo.id} todo={todo} token={token} todos={todos} setTodos={setTodos} user={user}/>
                     )}
                 </Grid>
                 <Grid item xs={4}>

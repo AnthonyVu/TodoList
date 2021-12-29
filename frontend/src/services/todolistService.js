@@ -24,6 +24,7 @@ const getTodo = async (token, id) => {
 }
 
 const addTodo = async (token, todo) => {
+    console.log('todo to add', todo);
     const response = await axios.post(baseUrl, todo, {
         headers: {
             'Authorization': `Bearer ${token}`
@@ -44,6 +45,7 @@ const deleteTodo = async (token, id) => {
 }
 
 const updateTodo = async(token, id, todo) => {
+    console.log('todo changed to', todo);
     const response = await axios.put(`${baseUrl}/id/${id}`, todo, {
         headers: {
             'Authorization': `Bearer ${token}`
