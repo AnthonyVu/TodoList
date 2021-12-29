@@ -1,237 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import {
-  BrowserRouter as Router,
-  Switch, Route, useHistory, useLocation
-} from "react-router-dom"
-import './App.css';
-import itemService from './utils';
-
-/*
-clean up form
-add another view to update todos
-add filtering options by each column 
-deploy
-*/
-const Header = () => {
-  return(
-    <div className="Header">
-      <h1>TodoList</h1>
-    </div>
-  );
-}
-
-const ItemList = (props) => {
-  if(props.items.length == 0) {
-    return (
-      <div></div>
-    )
-  }
-
-  const handleDeleteAll = () => {
-    itemService.deleteAllTodos().then(()=> {
-      console.log('deleted all todos successfully')
-      props.setItems([])
-    })
-  }
-
-  return(
-    <div className="itemList">
-      <h2>To Dos</h2>
-      <button onClick={handleDeleteAll}>Delete All</button>
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Due Date</th>
-            <th>Priority</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-          props.items.map((item) =>
-            <Item key={item.id} item={item} items={props.items} setItems={props.setItems}/>
-          )        
-          }
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-const Item = ({item, items, setItems}) => {
-
-  const history = useHistory();
-
-  const handleDelete = () => {
-    itemService.removeTodo(item.id).then(() => {
-      console.log('deleted item successfully')
-      setItems(items.filter(t => t.id !== item.id))
-    })
-  }
-
-  const handleEdit = () => {
-    itemService.getById(item.id).then((resp) => {
-      history.push({
-        pathname:'/edit', 
-        item: {resp},
-        items: {items},
-        setItems: {setItems}
-      })
-    })
-  }
-
-  return(
-    <tr>
-      <td>{item.title}</td>
-      <td>{item.date}</td>
-      <td>{item.priority}</td>
-      <td>
-        <div className="buttonParent">
-          <div className="editButton">
-            <button onClick={handleEdit}>edit</button>
-          </div>
-          <div className="deleteButton">
-            <button onClick={handleDelete}>delete</button>
-          </div>
-        </div>
-      </td>
-    </tr>
-  )
-}
-
-const EditForm = () => {
-
-  const location = useLocation();
-  const history = useHistory();
-  const item = location.item.resp
-  const [ newTitle, setNewTitle ] = useState(item.title)
-  const [ newDueDate, setNewDueDate ] = useState(item.date)
-  const [ newPriority, setNewPriority ] = useState(item.priority)
-
- const handleSubmit = (event) => {
-   event.preventDefault()
-   
-   const newItem = {
-     title: newTitle,
-     date: newDueDate,
-     priority: newPriority
-   }
-
-   itemService.updateTodo(item.id, newItem).then(() => {
-     console.log('updated item successfully')
-     location.setItems.setItems(location.items.items.map(el => (el.id == item.id) ? {id: item.id,...newItem} : {...el}))
-     history.push('/')
-   })
- }
-
-  return(
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div>
-        Title (50 characters max):
-        </div>
-        <div>
-        <input type="text" name="title" maxLength="50" value={newTitle} onChange={(event) => setNewTitle(event.target.value)}/>
-        </div>
-        <div>
-        Due Date:
-        </div>
-        <div>
-        <input type="date" name="date" value={newDueDate} onChange={(event) => setNewDueDate(event.target.value)}/>
-        </div>
-        <div>
-        Priority:
-        </div>
-        <div>
-         <select value={newPriority} onChange={(event) => setNewPriority(event.target.value)}>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-        <button type="submit">save</button>
-        <button onClick={() => history.push('/')}>cancel</button>
-      </form>
-    </div>
-  )
-}
-
-const Form = (props) => {
- const [ newTitle, setNewTitle ] = useState('')
- const [ newDueDate, setNewDueDate ] = useState('')
- const [ newPriority, setNewPriority ] = useState('Low')
-
-
- const handleSubmit = (event) => {
-   event.preventDefault()
-   
-   const newItem = {
-     title: newTitle,
-     date: newDueDate,
-     priority: newPriority
-   }
-
-   itemService.addTodo(newItem).then((resp) => {
-     console.log('added item successfully')
-     const newItems = props.items.concat(resp)
-     props.setItems(newItems)
-   })
- }
-
-  return(
-    <div className="form">
-      <form onSubmit={handleSubmit}>
-        <div>
-        Title (50 characters max):
-        </div>
-        <div>
-        <input type="text" name="title" maxLength="50" value={newTitle} onChange={(event) => setNewTitle(event.target.value)}/>
-        </div>
-        <div>
-        Due Date:
-        </div>
-        <div>
-        <input type="date" name="date" value={newDueDate} onChange={(event) => setNewDueDate(event.target.value)}/>
-        </div>
-        <div>
-        Priority:
-        </div>
-        <div>
-         <select value={newPriority} onChange={(event) => setNewPriority(event.target.value)}>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </div>
-        <button type="submit">Add</button>
-      </form>
-    </div>
-  );
-}
+import LoginButton from './components/LoginButton';
+import LogoutButton from './components/LogoutButton';
+import Profile from './components/Profile';
+import Todos from './components/Todos';
+import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect, useState } from "react";
+import Logo from './components/Logo';
+import todolistService from './services/todolistService';
+import UpdateForm from './components/UpdateForm';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import '@fontsource/roboto/300.css';
+import { Button, ButtonGroup, Container, Grid } from '@mui/material';
 
 function App() {
-  const [ items, setItems ] = useState([])
-  useEffect(() => {
-    itemService.getAll().then(
-      items => setItems(items)
-    )
-  },[])
+  const { user, isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const [accessToken, setAccessToken] = useState(null);
+  const [todos, setTodos] = useState([]);
+  const [firstSignOn, setFirstSignOn] = useState(false);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    const getAccessToken = async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        setAccessToken(token);
+        setFirstSignOn(true);
+      } catch (e) {
+        console.log(e.message);
+      }
+    };
+      
+    getAccessToken();
+  }, [getAccessTokenSilently]);
+
+  useEffect(() => {
+    const getTodos = async () => {
+      if(!firstSignOn) return;
+      const res = await todolistService.getAllTodos(accessToken, user.email);
+      setTodos(res);
+    }
+    getTodos();
+  }, [firstSignOn]);
+
+  if(isAuthenticated) {
+    return (
+      <div>
+        <Container maxWidth={'xl'} >
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+                <Logo variant={'h4'}/>
+            </Grid>
+            <Grid item xs={6} align='right'>
+              <ButtonGroup variant="text" aria-label="text button group">
+                <Button onClick={() => navigate('/')}>Todos</Button>
+                <Button onClick={() => navigate('/profile')}>Profile</Button>
+                <LogoutButton />
+              </ButtonGroup>
+            </Grid>
+        </Grid>
+        </Container>
+
+        <Routes>
+          <Route path='/' element={<Todos todos={todos} setTodos={setTodos} user={user} token={accessToken} />} />
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/todos/:id' element={<UpdateForm token={accessToken} todos={todos} setTodos={setTodos} user={user} />} />
+        </Routes>
+      </div>
+      
+    );
+  }
   return (
-    <div className="App">
-      <Header />
-      <Router>
-        <Switch>
-          <Route path='/edit'>
-            <EditForm />
-          </Route>
-          <Route path='/'>
-            <Form items={items} setItems={setItems}/>
-            <ItemList items={items} setItems={setItems}/>
-          </Route>
-        </Switch>
-      </Router>
-    </div>
+    <Container maxWidth={'xl'}>
+      <Grid container spacing={0}>
+          <Grid 
+              container
+              spacing={0}
+              direction="column"
+              alignItems="center"
+              justifyContent="center"
+              style={{ minHeight: '80vh' }}>
+              <Logo variant={'h1'}/>
+              <LoginButton />
+          </Grid>
+      </Grid>
+    </Container>
   );
 }
 
