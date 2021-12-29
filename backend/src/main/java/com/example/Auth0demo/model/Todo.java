@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -17,6 +15,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@Table(name = "todos")
 public class Todo {
     @Id
     @GeneratedValue
@@ -28,7 +27,7 @@ public class Todo {
     @NotBlank
     private String description;
     @NotNull
-    private LocalDate dueDate;
+    private LocalDate dueDate; // camelcase automatically adds an underscore during table creation
     @NotNull
     private String priority;
     @NotNull
